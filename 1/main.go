@@ -41,25 +41,23 @@ func main() {
 	for _, line := range lines {
 		fmt.Println(line)
 		first := 0
+		last := 0
 	forward:
-		for i := 0; i < len(line); i++ {
-			for j := i + 1; j <= min(len(line), i+5); j++ {
-				key := line[i:j]
-				val := digits[key]
-				if val != 0 {
-					first = val
+		for i := 0; i <= len(line); i++ {
+			truncLine := line[i:]
+			for k, v := range digits {
+				if strings.HasPrefix(truncLine, k) {
+					first = v
 					break forward
 				}
 			}
 		}
-		last := 0
 	backward:
 		for i := len(line); i >= 0; i-- {
-			for j := i - 1; j >= max(0, i-5); j-- {
-				key := line[j:i]
-				val := digits[key]
-				if val != 0 {
-					last = val
+			truncLine := line[0:i]
+			for k, v := range digits {
+				if strings.HasSuffix(truncLine, k) {
+					last = v
 					break backward
 				}
 			}
