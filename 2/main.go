@@ -42,6 +42,16 @@ func isGamePossible(gameData game, r int, g int, b int) bool {
 	return true
 }
 
+func minCubeCount(gameData game) (int, int, int) {
+	minR, minG, minB := 0, 0, 0
+	for _, pullData := range gameData.pulls {
+		minR = max(minR, pullData.r)
+		minG = max(minG, pullData.g)
+		minB = max(minB, pullData.b)
+	}
+	return minR, minG, minB
+}
+
 func parseGameData(line string) game {
 	pulls := []pull{}
 	// Parse game id
@@ -64,6 +74,7 @@ func main() {
 	lines := strings.Split(string(data), "\n")
 
 	result := 0
+	result2 := 0
 
 	for _, line := range lines {
 		if line == "" {
@@ -76,6 +87,9 @@ func main() {
 		if possible {
 			result += gameData.id
 		}
+		minR, minG, minB := minCubeCount(gameData)
+		result2 += minR * minG * minB
 	}
-	fmt.Println("Result = ", result)
+	fmt.Println("Result part 1 =", result)
+	fmt.Println("Result part 2 =", result2)
 }
