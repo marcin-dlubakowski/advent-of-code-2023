@@ -7,11 +7,11 @@ defmodule Aoc do
     |> Stream.map(fn {line, i} ->
       Regex.scan(~r/\d+/, line, return: :index)
       |> List.flatten()
-      |> Enum.map(fn t ->
+      |> Enum.map(fn {offset, length} ->
         {
-          line |> String.slice(elem(t, 0), elem(t, 1)) |> String.to_integer(10),
-          {i, elem(t, 0)},
-          {i, elem(t, 0) + elem(t, 1) - 1}
+          line |> String.slice(offset, length) |> String.to_integer(10),
+          {i, offset},
+          {i, offset + length - 1}
         }
       end)
     end)
@@ -25,37 +25,57 @@ defmodule Aoc do
     |> Stream.map(fn {line, i} ->
       Regex.scan(~r/[^\d\.\n]/, line, return: :index)
       |> List.flatten()
-      |> Enum.map(&{i, elem(&1, 0)})
+      |> Enum.map(&{String.at(line, elem(&1, 0)), i, elem(&1, 0)})
     end)
     |> Enum.to_list()
     |> List.flatten()
   end
 
+  def is_connected({_val, {minX, minY}, {_maxX, maxY}}, {_sym, symX, symY}) do
+    minX in (symX - 1)..(symX + 1) &&
+      (minY in (symY - 1)..(symY + 1) || maxY in (symY - 1)..(symY + 1))
+  end
+
   def start(_type, _args) do
+    part_one()
+    part_two()
+    {:ok, self()}
+  end
+
+  def part_one do
     numbers = get_numbers("input.txt")
     symbols = get_symbols("input.txt")
-
-    IO.inspect(numbers)
-    IO.inspect(symbols)
 
     result =
       numbers
       |> Enum.filter(fn number ->
-        symbols
-        |> Enum.any?(fn symbol ->
-          {x, minY} = elem(number, 1)
-          {_, maxY} = elem(number, 2)
-          {resX, resY} = symbol
-
-          x in (resX - 1)..(resX + 1) &&
-            (minY in (resY - 1)..(resY + 1) || maxY in (resY - 1)..(resY + 1))
-        end)
+        Enum.any?(symbols, fn symbol -> is_connected(number, symbol) end)
       end)
       |> Enum.map(&elem(&1, 0))
       |> Enum.sum()
 
     IO.puts("Result is: #{result}")
+  end
 
-    {:ok, self()}
+  def part_two do
+    numbers = get_numbers("input.txt")
+    symbols = get_symbols("input.txt")
+
+    result =
+      symbols
+      |> Enum.filter(&(elem(&1, 0) == "*"))
+      |> Enum.map(fn gear ->
+        {
+          gear,
+          numbers
+          |> Enum.filter(fn number -> is_connected(number, gear) end)
+          |> Enum.map(&elem(&1, 0))
+        }
+      end)
+      |> Enum.filter(fn {_gear, numbers} -> length(numbers) == 2 end)
+      |> Enum.map(fn {_gear, numbers} -> Enum.at(numbers, 0) * Enum.at(numbers, 1) end)
+      |> Enum.sum()
+
+    IO.puts("Result is: #{result}")
   end
 end
