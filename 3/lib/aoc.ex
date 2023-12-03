@@ -1,7 +1,15 @@
 defmodule Aoc do
   use Application
 
+  def start(_type, _args) do
+    part_one()
+    part_two()
+    {:ok, self()}
+  end
+
   def get_numbers(filename) do
+    # Idea: parse entire file to return list of all numbers with their positions
+    # e.g. {426, {1,3}, {1,5}} means 426 is on line 1 from 3 to 5
     File.stream!(filename)
     |> Stream.with_index()
     |> Stream.map(fn {line, i} ->
@@ -20,6 +28,8 @@ defmodule Aoc do
   end
 
   def get_symbols(filename) do
+    # Idea: parse entire file to return list of all symbols with their positions
+    # e.g. {"*", {1,3}} means * is on line 1 pos 3
     File.stream!(filename)
     |> Stream.with_index()
     |> Stream.map(fn {line, i} ->
@@ -32,14 +42,9 @@ defmodule Aoc do
   end
 
   def is_connected({_val, {minX, minY}, {_maxX, maxY}}, {_sym, symX, symY}) do
+    # Having a tuple for a number and symbol, check if they are connected
     minX in (symX - 1)..(symX + 1) &&
       (minY in (symY - 1)..(symY + 1) || maxY in (symY - 1)..(symY + 1))
-  end
-
-  def start(_type, _args) do
-    part_one()
-    part_two()
-    {:ok, self()}
   end
 
   def part_one do
