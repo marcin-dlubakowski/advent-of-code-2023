@@ -38,5 +38,28 @@ defmodule Aoc do
   end
 
   def part_two do
+    cards = decode_cards() |> Enum.with_index()
+    cards_count = cards |> Map.new(fn {_, index} -> {index, 1} end)
+
+    result =
+      cards
+      |> Enum.reduce(cards_count, fn {{winners, numbers}, i}, cards_count ->
+        points = numbers |> Enum.filter(&Enum.member?(winners, &1)) |> length()
+
+        if points == 0 do
+          cards_count
+        else
+          start = min(length(cards) - 1, i + 1)
+          stop = min(length(cards) - 1, i + points)
+
+          Enum.reduce(start..stop, cards_count, fn j, cards_count ->
+            Map.replace(cards_count, j, cards_count[j] + cards_count[i])
+          end)
+        end
+      end)
+      |> Map.values()
+      |> Enum.sum()
+
+    IO.inspect("Result is: #{result}")
   end
 end
