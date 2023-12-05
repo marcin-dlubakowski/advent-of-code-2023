@@ -1,0 +1,26 @@
+Traversing seed #14
+Mapping area = #[(50, 98, 2), (52, 50, 48)]
+Skipped pos = #14 for mapping (50, 98, 2)
+Skipped pos = #14 for mapping (52, 50, 48)
+Mapping area = #[(0, 15, 37), (37, 52, 2), (39, 0, 15)]
+Skipped pos = #14 for mapping (0, 15, 37)
+Skipped pos = #14 for mapping (37, 52, 2)
+Matched pos = #14 to dst = 53 for mapping (39, 0, 15)
+Mapping area = #[(49, 53, 8), (0, 11, 42), (42, 0, 7), (57, 7, 4)]
+Matched pos = #53 to dst = 49 for mapping (49, 53, 8)
+Matched pos = #49 to dst = 38 for mapping (0, 11, 42)
+Skipped pos = #38 for mapping (42, 0, 7)
+Skipped pos = #38 for mapping (57, 7, 4)
+Mapping area = #[(88, 18, 7), (18, 25, 70)]
+Skipped pos = #38 for mapping (88, 18, 7)
+Matched pos = #38 to dst = 31 for mapping (18, 25, 70)
+Mapping area = #[(45, 77, 23), (81, 45, 19), (68, 64, 13)]
+Skipped pos = #31 for mapping (45, 77, 23)
+Skipped pos = #31 for mapping (81, 45, 19)
+Skipped pos = #31 for mapping (68, 64, 13)
+Mapping area = #[(0, 69, 1), (1, 0, 69)]
+Skipped pos = #31 for mapping (0, 69, 1)
+Matched pos = #31 to dst = 32 for mapping (1, 0, 69)
+Mapping area = #[(60, 56, 37), (56, 93, 4)]
+Skipped pos = #32 for mapping (60, 56, 37)
+Skipped pos = #32 for mapping (56, 93, 4)
