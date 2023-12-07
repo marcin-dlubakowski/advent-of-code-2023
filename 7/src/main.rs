@@ -4,17 +4,29 @@ static CARD_ORDER: &[char] = &[
     '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
 ];
 
+static CARD_ORDER_JOKERIZE: &[char] = &[
+    'J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A',
+];
+
 #[derive(Debug)]
 struct Bid {
     hand: String,
     bid: i32,
     result: Hand,
+    jokerized_result: Hand,
 }
 
 impl Bid {
     pub fn new(hand: String, bid: i32) -> Bid {
         let result = cards_to_hand(&hand);
-        Bid { hand, bid, result }
+        let jokerized_result = cards_to_hand(&jokerize_hand(&hand));
+        // println!("{} = {}", &hand, &jokerize_hand(&hand));
+        Bid {
+            hand,
+            bid,
+            result,
+            jokerized_result,
+        }
     }
 }
 
@@ -41,6 +53,27 @@ fn tally<T: std::hash::Hash + std::cmp::Eq>(v: &[T]) -> HashMap<&T, i32> {
     res
 }
 
+fn jokerize_hand(hand: &String) -> String {
+    let hand_arr: Vec<char> = hand.chars().filter(|c| c != &'J').collect();
+
+    if hand_arr.is_empty() {
+        return String::from("AAAAA");
+    }
+
+    let data = tally(&hand_arr);
+    let max_val = data.values().max().unwrap();
+    let best_card = data
+        .clone()
+        .into_iter()
+        .filter(|(c, v)| c != &&'J' && v == max_val)
+        .max_by_key(|(c, _)| card_val(c, true));
+
+    match best_card {
+        Some(val) => hand.replace('J', &val.0.to_string()),
+        None => hand.clone(),
+    }
+}
+
 fn cards_to_hand(hand: &str) -> Hand {
     let hand_arr: Vec<char> = hand.chars().collect();
     let card_counts = tally(&hand_arr);
@@ -62,16 +95,19 @@ fn cards_to_hand(hand: &str) -> Hand {
     }
 }
 
-fn card_val(c: &char) -> usize {
-    CARD_ORDER.iter().position(|x| x == c).unwrap()
+fn card_val(c: &char, jokerize: bool) -> usize {
+    match jokerize {
+        false => CARD_ORDER.iter().position(|x| x == c).unwrap(),
+        true => CARD_ORDER_JOKERIZE.iter().position(|x| x == c).unwrap(),
+    }
 }
 
-fn compare_hands(a: &str, b: &str) -> Ordering {
+fn compare_hands(a: &str, b: &str, jokerize: bool) -> Ordering {
     for i in 0..5 {
         let s1 = a.chars().nth(i).unwrap();
         let s2 = b.chars().nth(i).unwrap();
         if s1 != s2 {
-            return card_val(&s1).cmp(&card_val(&s2));
+            return card_val(&s1, jokerize).cmp(&card_val(&s2, jokerize));
         }
     }
     Ordering::Equal
@@ -89,13 +125,19 @@ fn parse_data() -> Vec<Bid> {
         .collect()
 }
 
-fn part_one() {
+fn calculate(jokerize: bool) {
     let mut data = parse_data();
     data.sort_by(|a, b| {
-        if a.result == b.result {
-            compare_hands(&a.hand, &b.hand)
+        if jokerize {
+            match a.jokerized_result == b.jokerized_result {
+                true => compare_hands(&a.hand, &b.hand, true),
+                false => a.jokerized_result.cmp(&b.jokerized_result),
+            }
         } else {
-            a.result.cmp(&b.result)
+            match a.result == b.result {
+                true => compare_hands(&a.hand, &b.hand, false),
+                false => a.result.cmp(&b.result),
+            }
         }
     });
     let result: i32 = data
@@ -107,5 +149,6 @@ fn part_one() {
 }
 
 fn main() {
-    part_one();
+    calculate(false);
+    calculate(true);
 }
