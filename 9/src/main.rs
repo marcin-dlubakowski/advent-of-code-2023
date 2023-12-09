@@ -7,7 +7,7 @@ fn parse_data() -> Vec<Vec<i32>> {
         .collect()
 }
 
-fn dothething(datapoints: &[i32]) -> i32 {
+fn extrapolate(datapoints: &[i32]) -> i32 {
     if datapoints.iter().all(|val| *val == 0) {
         return 0;
     }
@@ -18,15 +18,25 @@ fn dothething(datapoints: &[i32]) -> i32 {
         .map(|vals| vals[1] - vals[0])
         .collect();
 
-    last + dothething(&diffs)
+    last + extrapolate(&diffs)
 }
 
-fn main() {
+fn solve(reverse: bool) {
     let data = parse_data();
     let result: i32 = data
         .into_iter()
-        .map(|datapoints| dothething(&datapoints))
+        .map(|mut datapoints| {
+            if reverse {
+                datapoints.reverse();
+            }
+            extrapolate(&datapoints)
+        })
         .sum();
 
     println!("Result is: {result}");
+}
+
+fn main() {
+    solve(false);
+    solve(true);
 }
